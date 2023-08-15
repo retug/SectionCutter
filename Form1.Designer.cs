@@ -327,7 +327,6 @@ namespace SectionCutter
             this.all_Other_Units.Name = "all_Other_Units";
             this.all_Other_Units.Size = new System.Drawing.Size(54, 17);
             this.all_Other_Units.TabIndex = 0;
-            this.all_Other_Units.TabStop = true;
             this.all_Other_Units.Text = "kN, M";
             this.all_Other_Units.UseVisualStyleBackColor = true;
             this.all_Other_Units.CheckedChanged += new System.EventHandler(this.all_Other_Units_CheckedChanged);
@@ -335,6 +334,7 @@ namespace SectionCutter
             // US_Units
             // 
             this.US_Units.AutoSize = true;
+            this.US_Units.Checked = true;
             this.US_Units.Location = new System.Drawing.Point(25, 19);
             this.US_Units.Name = "US_Units";
             this.US_Units.Size = new System.Drawing.Size(55, 17);

@@ -34,6 +34,7 @@ namespace SectionCutter
         List<Line> AreaTempGloLineList;
 
         List<ETABS_Point> ETABsAreaPointsList;
+        List<ETABS_Point> ETABSAReaPointsListGlo;
         List<MyPoint> MyPoints;
         List<MyPoint> MyTempPoints;
 
@@ -324,82 +325,10 @@ namespace SectionCutter
                     select startval + (val * interval)).ToArray();
         }
 
-        // function below, makeSelectionCutBtn is not used anymore, delete
-        private void makeSectionCutBtn(object sender, EventArgs e)
-        {
-            string TableKey = "Section Cut Definitions";
-            //string TableKey = "Material Properties - General";
-
-            //retreiving the table data review
-
-            string[] FieldKeyList = new string[0];
-            string GroupName = "";
-            int TableVersion = 0;
-            string[] FieldKeysIncluded = new string[0];
-            int NumberRecords = 0;
-            string[] TableData = new string[0];
-
-            _SapModel.DatabaseTables.GetTableForDisplayArray(TableKey, ref FieldKeyList, GroupName, ref TableVersion, ref FieldKeysIncluded, ref NumberRecords, ref TableData);
-
-            DatabaseTableResult resultsDatabaseTables = new DatabaseTableResult();
-            resultsDatabaseTables.FieldKeyList = FieldKeyList;
-            resultsDatabaseTables.TableVersion = TableVersion;
-            resultsDatabaseTables.FieldKeysIncluded = FieldKeysIncluded;
-            resultsDatabaseTables.NumberRecords = NumberRecords;
-            resultsDatabaseTables.TableData = TableData;
-
-            //trying to createa custom section cut, not working
-
-            string[] testETABs_Section_Cut_Data = new string[] { };
-            string[] teststring1 = new string[]
-                { "0001", "Quads", "All", "Analysis", "Default", "0", "0", "0", "Top or Right or Positive3","1", "1", "1",
-                    "0", "10", "0", "1"
-                };
-            string[] teststring2 = new string[]
-                { "0001", null , null, null, null, null, null, null, null, null, "1", "2",
-                    "10", "10", "0", null
-                };
-            string[] teststring3 = new string[]
-                { "0001", null, null, null, null, null, null, null, null, null, "1", "3",
-                    "10", "10", "1", null
-                };
-            string[] teststring4 = new string[]
-                { "0001", null, null, null, null, null, null, null, null, null, "1", "4",
-                    "0", "10", "1", null
-                };
-            testETABs_Section_Cut_Data = teststring1.Concat(teststring2).ToArray();
-            testETABs_Section_Cut_Data = testETABs_Section_Cut_Data.Concat(teststring3).ToArray();
-            testETABs_Section_Cut_Data = testETABs_Section_Cut_Data.Concat(teststring4).ToArray();
-
-
-
-            int TableVersiontest = 1;
-            string[] FieldKeysIncludedtest = new string[] {"Name", "DefinedBy", "Group", "ResultType", "ResultLoc", "RotAboutZ", "RotAboutY", "RotAboutX",
-                "ElementSide", "NumQuads", "QuadNum", "PointNum", "QuadX", "QuadY", "QuadZ", "GUID"};
-            int NumberRecordstest = 4;
-
-
-            _SapModel.DatabaseTables.SetTableForEditingArray(TableKey, ref TableVersiontest, ref FieldKeysIncludedtest, NumberRecordstest, ref testETABs_Section_Cut_Data);
-
-            bool FillImportLog = true;
-            int NumFatalErrors = 0;
-            int NumErrorMsgs = 0;
-            int NumWarnMsgs = 0;
-            int NumInfoMsgs = 0;
-            string ImportLog = "";
-
-
-            _SapModel.DatabaseTables.ApplyEditedTables(FillImportLog, ref NumFatalErrors, ref NumErrorMsgs, ref NumWarnMsgs, ref NumInfoMsgs, ref ImportLog);
-
-            DatabaseTableInfo databaseTableInfo = new DatabaseTableInfo();
-            databaseTableInfo.NumErrorMsgs = NumErrorMsgs;
-
-            databaseTableInfo.ImportLog = ImportLog;
-
-        }
 
         private void runAnalysis_Click(object sender, EventArgs e)
         {
+
 
             if (US_Units.Checked == true)
             {
@@ -431,13 +360,14 @@ namespace SectionCutter
 
             GlobalCoordinateSystem gcs = new GlobalCoordinateSystem(refPoint, vector);
             ETABsAreaPointsList = new List<ETABS_Point>();
+            ETABSAReaPointsListGlo = new List<ETABS_Point>();
 
             AreaLineList = new List<List<Line>>();
             AreaLineListGlo = new List<List<Line>>();
             MyGlobalAreaPoints = new List<List<MyPoint>>();
             MyPoints = new List<MyPoint>();
             MyTempPoints = new List<MyPoint>();
-            
+
             /// AreaPointListStrucIntact includes 
 
             for (int i = 0; i < AreaPointListStrucIntact.Count; i++)
@@ -455,14 +385,14 @@ namespace SectionCutter
                         samplePoint.X = X;
                         samplePoint.Y = Y;
                         samplePoint.Z = Z;
-                        ETABsAreaPointsList.Add(samplePoint);
+                        ETABSAReaPointsListGlo.Add(samplePoint);
                         List<double> myPoint = new List<double>() { X, Y, Z };
 
                         MyPoint point = new MyPoint(myPoint);
                         point.X = myPoint[0];
                         point.Y = myPoint[1];
                         point.Z = myPoint[2];
-                        
+
 
 
                         //MyPoint point = new MyPoint(myPoint);
@@ -475,7 +405,7 @@ namespace SectionCutter
 
                         List<double> myTempPoint = new List<double>() { X, Y, Z };
 
-                        MyPoint LCpointArea= new MyPoint(myTempPoint);
+                        MyPoint LCpointArea = new MyPoint(myTempPoint);
                         LCpointArea.X = point.LocalCoords[0];
                         LCpointArea.Y = point.LocalCoords[1];
                         LCpointArea.Z = point.LocalCoords[2];
@@ -497,7 +427,7 @@ namespace SectionCutter
 
                     if (j >= 1 && j < AreaPointListStrucIntact[i].Count)
                     {
-                        
+
 
                         Line myLine = new Line();
                         myLine.startPoint = MyTempPoints[j - 1];
@@ -518,7 +448,7 @@ namespace SectionCutter
                     else
                     {
                         Line myLine = new Line();
-                        myLine.startPoint = MyTempPoints[j-1];
+                        myLine.startPoint = MyTempPoints[j - 1];
                         myLine.endPoint = MyTempPoints[0];
 
                         AreaTempLineList.Add(myLine);
@@ -534,15 +464,17 @@ namespace SectionCutter
                 AreaLineList.Add(AreaTempLineList);
                 AreaLineListGlo.Add(AreaTempGloLineList);
             }
+        
+            
 
             //this gathers all of the XYZ points of the area objects to determine the max and the minimum U and V values
             for (int i = 0; i < AreaPointList.Count; i++)
             {
                 _SapModel.PointObj.GetCoordCartesian(AreaPointList[i].Points, ref X, ref Y, ref Z);
-                ETABS_Point samplePoint = new ETABS_Point();
-                samplePoint.X = X;
-                samplePoint.Y = Y;
-                samplePoint.Z = Z;
+                //ETABS_Point samplePoint = new ETABS_Point();
+                //samplePoint.X = X;
+                //samplePoint.Y = Y;
+                //samplePoint.Z = Z;
                 //ETABsAreaPointsList.Add(samplePoint);
                 List<double> myPoint = new List<double>() { X, Y, Z };
 
@@ -590,8 +522,8 @@ namespace SectionCutter
             double height = ref_Point.Z;
 
             // creates a list of values between max and min u values.
-            //double[] range_values = linspace(Umin + 1, Umax - 1, n_cuts);
-            double[] range_values = linspace(0 + 1, Umax - 1, n_cuts);
+            double[] range_values = linspace(Umin + 1, Umax - 1, n_cuts);
+            
 
             //creates the lists of 4 points
             List<List<MyPoint>> sectionPlanes = new List<List<MyPoint>>();
@@ -899,7 +831,7 @@ namespace SectionCutter
 
         private void US_Units_CheckedChanged(object sender, EventArgs e)
         {
-            all_Other_Units.Checked = true;
+            all_Other_Units.Checked = false;
         }
 
         private void all_Other_Units_CheckedChanged(object sender, EventArgs e)
