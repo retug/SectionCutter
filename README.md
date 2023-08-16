@@ -20,10 +20,11 @@ Section Cut Tool assit engineers in slicing planar diaprhagms. Working to active
 - Open ETABs
 - Under Tools, Add/Show Plugins, file path to  downloaded SectionCutter.dll
 
+![image](https://github.com/retug/SectionCutter/assets/45467091/689d1eb9-2f46-4aaf-8d7f-39f8342b33cd)
+
 ![image](https://github.com/retug/SectionCutter/assets/45467091/7736c7e8-8b10-4afd-8cce-dc3589c726c2)
 
 
-![image](https://github.com/retug/SectionCutter/assets/45467091/b7a3a272-10cf-4abf-8db4-292460e2459c)
 
 
 
