@@ -1,6 +1,6 @@
 # SectionCutter
 
-Section Cut Tool assit engineers in slicing planar diaphragms. Working to actively support, let me know of bugs/program features you want added.
+Section Cut Tool to assit engineers in slicing planar diaphragms. Working to actively support, let me know of bugs/program features you want added.
 
 ![image](https://github.com/retug/SectionCutter/assets/45467091/0468ba99-8522-447b-9961-20aa44df3fba)
 
