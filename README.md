@@ -17,7 +17,7 @@ Section Cut Tool to assit engineers in slicing planar diaphragms. Working to act
 
 # Install Process
 - Download the SectionCutter.dll, LiveCharts.WinForms.dll, LiveCharts.Wpf.dll
-- Place all .dll files in one folder
+- Place all .dll files in one folder, right click and unblock the .dll if required.
   ![image](https://github.com/retug/SectionCutter/assets/45467091/8d9dd493-03c5-4494-a4cc-3d34e66f6ce8)
 
 - Open ETABs
