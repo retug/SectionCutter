@@ -18,6 +18,9 @@ Section Cut Tool to assit engineers in slicing planar diaphragms. Working to act
 # Install Process
 - See youtube video https://www.youtube.com/watch?v=CUDt8zJYAoc
 
+# How to use
+- See youtube video https://www.youtube.com/watch?v=L_XXPHafNQQ
+
 
 
 
