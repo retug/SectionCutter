@@ -14,6 +14,9 @@ using MathNet.Numerics.Data.Text;
 using LiveCharts;
 using LiveCharts.Wpf;
 using System.Drawing.Drawing2D;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Windows;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace SectionCutter
 {
@@ -59,9 +62,7 @@ namespace SectionCutter
             _Plugin = Plugin;
             _SapModel = SapModel;
             InitializeComponent();
-            
-
-            
+            this.Load += Form1_Load;
         }
 
         private void Form1_Paint(object send, PaintEventArgs e)
@@ -78,6 +79,7 @@ namespace SectionCutter
         private void Form1_Load(object sender, EventArgs e)
         {
             // do setup things here
+            this.Paint -= Form1_Paint;
 
         }
 
@@ -89,10 +91,21 @@ namespace SectionCutter
 
         private void ShowLoadCase_Load(object sender, EventArgs e)
         {
+            // Clear the existing items in LoadCaseList and LoadCaseComBox
+            if (LoadCaseList != null)
+            {
+                LoadCaseList.Clear();
+                LoadCaseComBox.Items.Clear();
+            }
+
             int NumberNames = 1;
             string[] MyName = null;
+            int NumberItems = 0;
+            string[] CaseName = null;
+            int[] status = null;
 
             _SapModel.LoadCases.GetNameList(ref NumberNames, ref MyName);
+            _SapModel.Analyze.GetCaseStatus(ref NumberItems, ref CaseName, ref status);
 
             LoadCaseList = new List<LoadCase>();
 
@@ -101,8 +114,37 @@ namespace SectionCutter
                 LoadCase LComb = new LoadCase();
                 LComb.NumberNames = NumberNames;
                 LComb.MyName = MyName[i];
+                LComb.Status = status[i];              
+
                 LoadCaseComBox.Items.Add(MyName[i]);
                 LoadCaseList.Add(LComb);
+                // Subscribe to the DrawItem event
+            }
+            // Set the DrawMode to OwnerDrawFixed to enable custom drawing of items
+            LoadCaseComBox.DrawMode = DrawMode.OwnerDrawFixed;
+
+            // Subscribe to the DrawItem event
+            LoadCaseComBox.DrawItem += LoadCaseComBox_DrawItem;
+        }
+        // Function that changes the background color of the combo box dropdown menu
+        // items to green if the status is 4 (this means the results are available from the selected load case)
+        private void LoadCaseComBox_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            if (e.Index >= 0)
+            {
+                LoadCase LComb = LoadCaseList[e.Index];
+
+                // Set the text color to green if the status is 4
+                Brush brush = (LComb.Status == 4) ? Brushes.Green : Brushes.Black;
+
+                // Draw the item text with the specified color
+                e.Graphics.DrawString(LoadCaseComBox.Items[e.Index].ToString(), e.Font, brush, e.Bounds, StringFormat.GenericDefault);
+
+                // If the item is selected, draw the focus rectangle
+                if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+                {
+                    e.DrawFocusRectangle();
+                }
             }
         }
 
@@ -261,7 +303,7 @@ namespace SectionCutter
                 e.Handled = true;
             }
             // only allow one decimal point
-            if ((e.KeyChar == '.') && ((sender as TextBox).Text.IndexOf('.') > -1))
+            if ((e.KeyChar == '.') && ((sender as System.Windows.Forms.TextBox).Text.IndexOf('.') > -1))
             {
                 e.Handled = true;
             }
@@ -471,11 +513,6 @@ namespace SectionCutter
             for (int i = 0; i < AreaPointList.Count; i++)
             {
                 _SapModel.PointObj.GetCoordCartesian(AreaPointList[i].Points, ref X, ref Y, ref Z);
-                //ETABS_Point samplePoint = new ETABS_Point();
-                //samplePoint.X = X;
-                //samplePoint.Y = Y;
-                //samplePoint.Z = Z;
-                //ETABsAreaPointsList.Add(samplePoint);
                 List<double> myPoint = new List<double>() { X, Y, Z };
 
                 MyPoint point = new MyPoint(myPoint);
@@ -483,17 +520,13 @@ namespace SectionCutter
                 point.Y = myPoint[1];
                 point.Z = myPoint[2];
 
-                
-
-
-                //MyPoint point = new MyPoint(myPoint);
                 point.glo_to_loc(gcs);
                 ETABS_Point localPoint = new ETABS_Point();
                 localPoint.X = point.LocalCoords[0];
                 localPoint.Y = point.LocalCoords[1];
                 localPoint.Z = point.LocalCoords[2];
                 ETABsAreaPointsList.Add(localPoint);
-                //MyPoints.Add(point);
+
 
             }
 
@@ -542,6 +575,7 @@ namespace SectionCutter
 
                 List<MyPoint> xingPoints = new List<MyPoint>();
 
+                //Find intersection point with main polygon
                 RayCasting.RayCast(sectionPoint1, sectionPoint2, gcs, AreaLineList, out int countCrosses, ref xingPoints);
 
                 List<MyPoint> sectionPlane = new List<MyPoint>();
@@ -604,11 +638,23 @@ namespace SectionCutter
             databaseTableInfo.NumErrorMsgs = NumErrorMsgs;
 
             databaseTableInfo.ImportLog = ImportLog;
+            //_SapModel.SetModelIsLocked(false);
+            //_SapModel.Analyze.RunAnalysis();
 
-            _SapModel.Analyze.RunAnalysis();
-            //sets to kip, ft, farienheit
-            //_SapModel.SetPresentUnits(eUnits.kip_ft_F);
+            //Test if analysis needs to be run
+            string mySelectedCase = LoadCaseComBox.SelectedItem.ToString();
+            int index = LoadCaseList.FindIndex(x => x.MyName == mySelectedCase);
+            //If results are available, do not rerun the analysis.
+            if (LoadCaseList[index].Status != 4)
+            {
+                // Display the message box
+                MessageBox.Show("This requires you to rerun the analysis", "Rerun", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                _SapModel.GetModelIsLocked();
+                _SapModel.Analyze.RunAnalysis();
+            }
 
+
+            _SapModel.Results.Setup.DeselectAllCasesAndCombosForOutput();
             _SapModel.Results.Setup.SetCaseSelectedForOutput(LoadCaseComBox.SelectedItem.ToString());
 
 
@@ -687,8 +733,6 @@ namespace SectionCutter
 
             };
 
-            
-
 
             scatterPlot.AxisX.Clear();
             scatterPlot.AxisX.Add(new LiveCharts.Wpf.Axis
@@ -744,9 +788,6 @@ namespace SectionCutter
 
 
             };
-
-
-            
 
 
             momentScatterPlot.AxisX.Clear();

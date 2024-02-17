@@ -10,5 +10,6 @@ namespace SectionCutter
     {
         public int NumberNames { get; set; }
         public string MyName { get; set; }
+        public int Status { get; set; }
     }
 }
