@@ -17,6 +17,7 @@ using System.Drawing.Drawing2D;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Windows;
 using MessageBox = System.Windows.Forms.MessageBox;
+using LiveCharts.Helpers;
 
 namespace SectionCutter
 {
@@ -114,11 +115,124 @@ namespace SectionCutter
                 LoadCase LComb = new LoadCase();
                 LComb.NumberNames = NumberNames;
                 LComb.MyName = MyName[i];
-                LComb.Status = status[i];              
+                LComb.Status = status[i];
 
+                //This is used to determine if the load case is linear static, if it is, check to see if there is an auto seismic/wind case.
+                
+                string Name = MyName[i];
+                eLoadCaseType CaseType = new eLoadCaseType();
+                int SubType = 0;
+                eLoadPatternType DesignType = new eLoadPatternType();
+                int DesignTypeOption = 0;
+                int Auto = 0;
+
+                _SapModel.LoadCases.GetTypeOAPI_1(Name, ref CaseType, ref SubType, ref DesignType, ref DesignTypeOption, ref Auto);
+                
+                //If it is linear static, let's determine if there is autoseismic/autowind in the case in question. This gathers all the load patterns in a load case
+                if (CaseType == eLoadCaseType.LinearStatic)
+                {
+                    int NumberLoads = 0;
+                    string[] LoadType = null;
+                    string[] LoadName = null;
+                    double[] SF = null;
+                    _SapModel.LoadCases.StaticLinear.GetLoads(Name, ref NumberItems, ref LoadType, ref LoadName, ref SF);
+
+                    foreach (string loadName in LoadName)
+                    {
+                        eLoadPatternType MyType = new eLoadPatternType();
+                        _SapModel.LoadPatterns.GetLoadType(loadName, ref MyType);
+                        if (MyType == eLoadPatternType.Quake)
+                        {
+                            string CodeName = "";
+                            _SapModel.LoadPatterns.GetAutoSeismicCode(loadName, ref CodeName);
+
+                            int NumberTables = 0;
+                            string[] TableKey = null;
+                            string[] TableName = null;
+                            int[] ImportType = null;
+                            _SapModel.DatabaseTables.GetAvailableTables(ref NumberTables, ref TableKey, ref TableName, ref ImportType);
+                            if (CodeName == "ASCE 7-16")
+                            {
+                                string myTableKey = "Load Pattern Definitions - Auto Seismic - ASCE 7-16";
+                                string[] FieldKeyList = null;
+                                string GroupName = "";
+                                int TableVersion = 0;
+                                string[] FieldsKeysIncluded = null;
+                                int NumberRecords = 0;
+                                string[] TableData = null;
+                                _SapModel.DatabaseTables.GetTableForDisplayArray(myTableKey, ref FieldKeyList, GroupName, ref TableVersion, ref FieldsKeysIncluded, ref NumberRecords, ref TableData);
+
+                                string[] seismicInfo = new string[6]; // Assuming you want 6 elements (index 2 to 7 inclusive)
+                                Array.Copy(TableData, 2, seismicInfo, 0, 6); // Copies 6 elements starting from index 2
+
+                                string[] SeismicName = { "EQx", "EQx + E", "EQx - E", "EQy", "EQy + E", "EQy - E" };
+
+                                // Create the dictionary, this contains what type of loads are included.
+                                LComb.SeismicInfo = new Dictionary<string, bool>();
+
+                                // Populate the dictionary
+                                for (int j = 0; j < SeismicName.Length; j++)
+                                {
+                                    bool seis; // Declare seis outside of if-else blocks
+                                    if (seismicInfo[j] == "Yes")
+                                    {
+                                        seis = true;
+                                    }
+                                    else
+                                    {
+                                        seis = false;
+                                    }
+                                    LComb.SeismicInfo.Add(SeismicName[j], seis);
+                                }
+                            }
+                            else if (CodeName == "ASCE 7-22")
+                            {
+                                string myTableKey = "Load Pattern Definitions - Auto Seismic - ASCE 7-22";
+                                string[] FieldKeyList = null;
+                                string GroupName = "";
+                                int TableVersion = 0;
+                                string[] FieldsKeysIncluded = null;
+                                int NumberRecords = 0;
+                                string[] TableData = null;
+                                _SapModel.DatabaseTables.GetTableForDisplayArray(myTableKey, ref FieldKeyList, GroupName, ref TableVersion, ref FieldsKeysIncluded, ref NumberRecords, ref TableData);
+
+                                string[] seismicInfo = new string[6]; // Assuming you want 6 elements (index 2 to 7 inclusive)
+                                Array.Copy(TableData, 2, seismicInfo, 0, 6); // Copies 6 elements starting from index 2
+
+
+                                string[] SeismicName = { "EQx", "EQx + E", "EQx - E", "EQy", "EQy + E", "EQy - E" };
+
+                                // Create the dictionary this contains what type of loads are included.
+                                LComb.SeismicInfo = new Dictionary<string, bool>();
+
+                                // Populate the dictionary
+                                for (int j = 0; j < SeismicName.Length; j++)
+                                {
+                                    bool seis; // Declare seis outside of if-else blocks
+                                    if (seismicInfo[j] == "Yes")
+                                    {
+                                        seis = true;
+                                    }
+                                    else
+                                    {
+                                        seis = false;
+                                    }
+                                    // Assuming seismicInfo[i] contains "True" or "False", you need to convert it to bool
+                                    
+                                    LComb.SeismicInfo.Add(SeismicName[j], seis);
+                                }
+                            }
+                            else 
+                            { 
+                                return; 
+                            }    
+
+                        }
+                        
+                    }
+                }
                 LoadCaseComBox.Items.Add(MyName[i]);
                 LoadCaseList.Add(LComb);
-                // Subscribe to the DrawItem event
             }
             // Set the DrawMode to OwnerDrawFixed to enable custom drawing of items
             LoadCaseComBox.DrawMode = DrawMode.OwnerDrawFixed;
@@ -631,8 +745,8 @@ namespace SectionCutter
             int NumInfoMsgs = 0;
             string ImportLog = "";
 
-
-            _SapModel.DatabaseTables.ApplyEditedTables(FillImportLog, ref NumFatalErrors, ref NumErrorMsgs, ref NumWarnMsgs, ref NumInfoMsgs, ref ImportLog);
+            int ret = 1;
+            ret = _SapModel.DatabaseTables.ApplyEditedTables(FillImportLog, ref NumFatalErrors, ref NumErrorMsgs, ref NumWarnMsgs, ref NumInfoMsgs, ref ImportLog);
 
             DatabaseTableInfo databaseTableInfo = new DatabaseTableInfo();
             databaseTableInfo.NumErrorMsgs = NumErrorMsgs;
