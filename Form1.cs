@@ -18,6 +18,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Windows;
 using MessageBox = System.Windows.Forms.MessageBox;
 using LiveCharts.Helpers;
+using System.Windows.Controls;
 
 namespace SectionCutter
 {
@@ -53,8 +54,9 @@ namespace SectionCutter
         string startPoint = null;
         VectorValue vectorXValue = new VectorValue();
         VectorValue vectorYValue = new VectorValue();
+        List<string> selectedLoadSteps;
 
-        
+
 
 
 
@@ -64,6 +66,12 @@ namespace SectionCutter
             _SapModel = SapModel;
             InitializeComponent();
             this.Load += Form1_Load;
+            // Load Steps that Want to be plotted
+            selectedLoadSteps = new List<string>();
+            
+            // Attach the SelectionChangeCommitted event handler
+            listBoxLoadSteps.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+            
         }
 
         private void Form1_Paint(object send, PaintEventArgs e)
@@ -98,6 +106,7 @@ namespace SectionCutter
                 LoadCaseList.Clear();
                 LoadCaseComBox.Items.Clear();
             }
+
 
             int NumberNames = 1;
             string[] MyName = null;
@@ -146,11 +155,7 @@ namespace SectionCutter
                             string CodeName = "";
                             _SapModel.LoadPatterns.GetAutoSeismicCode(loadName, ref CodeName);
 
-                            int NumberTables = 0;
-                            string[] TableKey = null;
-                            string[] TableName = null;
-                            int[] ImportType = null;
-                            _SapModel.DatabaseTables.GetAvailableTables(ref NumberTables, ref TableKey, ref TableName, ref ImportType);
+                           
                             if (CodeName == "ASCE 7-16")
                             {
                                 string myTableKey = "Load Pattern Definitions - Auto Seismic - ASCE 7-16";
@@ -481,10 +486,57 @@ namespace SectionCutter
                     select startval + (val * interval)).ToArray();
         }
 
+        private void ListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // Clear the selectedSections list
+            selectedLoadSteps.Clear();
+
+            // Add the selected items to the selectedSections list
+            foreach (var item in listBoxLoadSteps.SelectedItems)
+            {
+                selectedLoadSteps.Add(item.ToString());
+            }
+        }
+
+        //static List<int> FindIndices(string[] array, string value)
+        //{
+        //    List<int> indices = new List<int>();
+        //    for (int i = 0; i < array.Length; i++)
+        //    {
+        //        if (array[i] == value)
+        //        {
+        //            indices.Add(i);
+        //        }
+        //    }
+        //    return indices;
+        //}
 
         private void runAnalysis_Click(object sender, EventArgs e)
         {
+            //Test if analysis needs to be run
+            string mySelectedCase = LoadCaseComBox.SelectedItem.ToString();
+            int index = LoadCaseList.FindIndex(x => x.MyName == mySelectedCase);
 
+            // Clear existing items in the combo box
+            listBoxLoadSteps.Items.Clear();
+
+            // Ensure LoadCaseList is not null
+            if (LoadCaseList != null)
+            {
+                // Ensure SeismicInfo is not null
+                if (LoadCaseList[index].SeismicInfo != null)
+                {
+                    // Iterate over the key-value pairs in SeismicInfo
+                    foreach (var kvp in LoadCaseList[index].SeismicInfo)
+                    {
+                        // Check if the value is true
+                        if (kvp.Value)
+                        {
+                            listBoxLoadSteps.Items.Add(kvp.Key);
+                        }
+                    }
+                }
+            }
 
             if (US_Units.Checked == true)
             {
@@ -620,8 +672,8 @@ namespace SectionCutter
                 AreaLineList.Add(AreaTempLineList);
                 AreaLineListGlo.Add(AreaTempGloLineList);
             }
-        
-            
+
+
 
             //this gathers all of the XYZ points of the area objects to determine the max and the minimum U and V values
             for (int i = 0; i < AreaPointList.Count; i++)
@@ -670,7 +722,7 @@ namespace SectionCutter
 
             // creates a list of values between max and min u values.
             double[] range_values = linspace(Umin + 1, Umax - 1, n_cuts);
-            
+
 
             //creates the lists of 4 points
             List<List<MyPoint>> sectionPlanes = new List<List<MyPoint>>();
@@ -702,7 +754,7 @@ namespace SectionCutter
 
                 string name = counter.ToString().PadLeft(4, '0');
                 List<string> string1 = new List<string>
-                
+
                 { name, "Quads", "All", "Analysis", "Default", angle.ToString(), "0", "0", "Top or Right or Positive3", "1", "1", "1",
                     listPoint1[0].ToString(), listPoint1[1].ToString(), listPoint1[2].ToString(), "1"
                 };
@@ -755,9 +807,7 @@ namespace SectionCutter
             //_SapModel.SetModelIsLocked(false);
             //_SapModel.Analyze.RunAnalysis();
 
-            //Test if analysis needs to be run
-            string mySelectedCase = LoadCaseComBox.SelectedItem.ToString();
-            int index = LoadCaseList.FindIndex(x => x.MyName == mySelectedCase);
+
             //If results are available, do not rerun the analysis.
             if (LoadCaseList[index].Status != 4)
             {
@@ -772,6 +822,73 @@ namespace SectionCutter
             _SapModel.Results.Setup.SetCaseSelectedForOutput(LoadCaseComBox.SelectedItem.ToString());
 
 
+            int NumberTables = 0;
+            string[] TableKey2 = null;
+            string[] TableName2 = null;
+            int[] ImportType2 = null;
+            _SapModel.DatabaseTables.GetAvailableTables(ref NumberTables, ref TableKey2, ref TableName2, ref ImportType2);
+
+            string TableKey3 = "Section Cut Forces - Analysis";
+            string[] FieldKeyList = null;
+            string GroupName = "All";
+            int TableVersion = 1;
+            string[] FieldKeysIncluded2 = null;
+            int NumRecords = 0;
+            string[] TableData2 = null;
+
+            _SapModel.DatabaseTables.GetTableForDisplayArray(TableKey3, ref FieldKeyList, GroupName, ref TableVersion, ref FieldKeysIncluded2, ref NumRecords, ref TableData2);
+
+            //this is the multiple load steps
+            if (FieldKeysIncluded2.Contains("StepNumber"))
+            {
+                //This list will contain all of the results from one load case with multiplesteps                
+                List<SectionResults> listSectionResults = new List<SectionResults>();
+                List<int> indices = new List<int>();
+                // Find indices of "EqAll" in TableData2
+                int loadSteps = listBoxLoadSteps.Items.Count;
+                indices = SectionCutResults.FindIndices(TableData2, LoadCaseComBox.SelectedItem.ToString());
+
+                //int step = indices.Count() / loadSteps;
+                // Grab specific items by index using LINQ
+                var specificItems = indices.Where((item, index2) => index2 % loadSteps == 0);
+
+
+                
+
+                for (int i  = 0; i <= loadSteps; i++)
+                {
+                    List<Double> F1loop = new List<double>();
+                    List<Double> F2loop = new List<double>();
+                    List<Double> F3loop = new List<double>();
+                    List<Double> M1loop = new List<double>();
+                    List<Double> M2loop = new List<double>();
+                    List<Double> M3loop = new List<double>();
+                    //IF THIS TABLE GETS REWORKED IN THE FUTURE, THIS WILL NEED TO BE RECODED!!!
+                    SectionResults loadCaseResults = new SectionResults();
+                    foreach (int sectionResult in specificItems)
+                    {
+                        F1loop.Add(Convert.ToDouble(TableData2[sectionResult + i * 14 + 4]));
+                        F2loop.Add(Convert.ToDouble(TableData2[sectionResult + i * 14 + 5]));
+                        F3loop.Add(Convert.ToDouble(TableData2[sectionResult + i * 14 + 6]));
+                        M1loop.Add(Convert.ToDouble(TableData2[sectionResult + i * 14 + 7]));
+                        M2loop.Add(Convert.ToDouble(TableData2[sectionResult + i * 14 + 8]));
+                        M3loop.Add(Convert.ToDouble(TableData2[sectionResult + i * 14 + 9]));
+                    }
+                    loadCaseResults.F1 = F1loop.ToArray();
+                    loadCaseResults.F2 = F2loop.ToArray();
+                    loadCaseResults.F3 = F3loop.ToArray();
+                    loadCaseResults.M1 = M1loop.ToArray();
+                    loadCaseResults.M2 = M2loop.ToArray();
+                    loadCaseResults.M3 = M3loop.ToArray();
+                    listSectionResults.Add(loadCaseResults);
+                }
+
+            }
+
+            else
+            {
+                ;
+            }
             int NumberResults = 1;
             string[] SCut = new string[0];
             string[] LoadCase = new string[0];
@@ -794,13 +911,13 @@ namespace SectionCutter
             sectionResults.M2 = M2;
             sectionResults.M3 = M3;
 
-            
+
 
             List<TabularData> TabDataList = new List<TabularData>();
             for (int i = 0; i < sectionResults.F2.Length; i++)
             {
                 TabularData sampleData = new TabularData();
-                sampleData.Location = range_values[i] ;
+                sampleData.Location = range_values[i];
                 sampleData.Shear = sectionResults.F1[i];
                 sampleData.Moment = sectionResults.M3[i];
                 sampleData.Axial = sectionResults.F2[i];
@@ -826,14 +943,13 @@ namespace SectionCutter
                 titleLocation = "Location (m)";
             }
 
-
-                ////// Shear ScatterPlot //////////
-                ///
-                ChartValues<LiveCharts.Defaults.ObservablePoint> shearPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
+            ////// Shear ScatterPlot //////////
+            ///
+            ChartValues<LiveCharts.Defaults.ObservablePoint> shearPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
 
             for (int i = 0; i < sectionResults.F1.Length; i++)
             {
-                shearPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = range_values[i] , Y = sectionResults.F1[i] });
+                shearPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = range_values[i], Y = sectionResults.F1[i] });
 
             }
 
@@ -881,7 +997,7 @@ namespace SectionCutter
 
             ////// Moment ScatterPlot //////////
 
-            
+
 
 
             ChartValues<LiveCharts.Defaults.ObservablePoint> momentPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
@@ -889,7 +1005,7 @@ namespace SectionCutter
             for (int i = 0; i < sectionResults.M3.Length; i++)
             {
 
-                momentPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = range_values[i] , Y = sectionResults.M3[i] });
+                momentPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = range_values[i], Y = sectionResults.M3[i] });
             }
 
 
@@ -953,10 +1069,10 @@ namespace SectionCutter
                     locationPlot.Series.Add(locationSeries);
                 }
             }
-       
+
 
             for (int i = 0; i < range_values.Count(); i++)
-                
+
             {
                 ChartValues<LiveCharts.Defaults.ObservablePoint> cutPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
                 cutPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = Double.Parse(ETABs_Section_Cut_Data[i * 4][12]), Y = Double.Parse(ETABs_Section_Cut_Data[i * 4][13]) });
@@ -977,9 +1093,6 @@ namespace SectionCutter
                 locationPlot.Series.Add(cutSeries);
             }
 
-
-            
-
             dataGridView3.DataSource = TabDataList;
 
         }
@@ -994,20 +1107,7 @@ namespace SectionCutter
             US_Units.Checked = false;
         }
 
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
 
-        }
-
-        private void vectorX_TextChanged_1(object sender, EventArgs e)
-        {
-
-        }
-
-        private void NumSlices_TextChanged(object sender, EventArgs e)
-        {
-
-        }
     }
 }
 

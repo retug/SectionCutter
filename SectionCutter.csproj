@@ -73,6 +73,7 @@
     <Compile Include="LoadCase.cs" />
     <Compile Include="Point_Global_Coordinate.cs" />
     <Compile Include="RayCasting.cs" />
+    <Compile Include="SectionCutResults.cs" />
     <Compile Include="SectionResults.cs" />
     <Compile Include="SelectedObjects.cs" />
     <Compile Include="Form1.cs">
