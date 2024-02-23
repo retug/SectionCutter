@@ -546,7 +546,7 @@ namespace SectionCutter
             {
                 _SapModel.SetPresentUnits(eUnits.kN_m_C);
             }
-            scatterPlot.Visible = true;
+            shearScatterPlot.Visible = true;
             momentScatterPlot.Visible = true;
             locationPlot.Visible = true;
 
@@ -837,12 +837,14 @@ namespace SectionCutter
             string[] TableData2 = null;
 
             _SapModel.DatabaseTables.GetTableForDisplayArray(TableKey3, ref FieldKeyList, GroupName, ref TableVersion, ref FieldKeysIncluded2, ref NumRecords, ref TableData2);
+            //THIS IS THE LIST TO HOLD ALL LOAD STEP RESULTS FOR A SELECTED LOAD CASE WITH STEPS
+            List<SectionResults> listSectionResults = new List<SectionResults>();
 
             //this is the multiple load steps
             if (FieldKeysIncluded2.Contains("StepNumber"))
             {
                 //This list will contain all of the results from one load case with multiplesteps                
-                List<SectionResults> listSectionResults = new List<SectionResults>();
+                
                 List<int> indices = new List<int>();
                 // Find indices of "EqAll" in TableData2
                 int loadSteps = listBoxLoadSteps.Items.Count;
@@ -852,10 +854,8 @@ namespace SectionCutter
                 // Grab specific items by index using LINQ
                 var specificItems = indices.Where((item, index2) => index2 % loadSteps == 0);
 
-
-                
-
-                for (int i  = 0; i <= loadSteps; i++)
+                //run from 0 to load steps
+                for (int i  = 0; i < loadSteps; i++)
                 {
                     List<Double> F1loop = new List<double>();
                     List<Double> F2loop = new List<double>();
@@ -865,6 +865,7 @@ namespace SectionCutter
                     List<Double> M3loop = new List<double>();
                     //IF THIS TABLE GETS REWORKED IN THE FUTURE, THIS WILL NEED TO BE RECODED!!!
                     SectionResults loadCaseResults = new SectionResults();
+                    //We generatate all of the results for an individual load case, load step in this loop here.
                     foreach (int sectionResult in specificItems)
                     {
                         F1loop.Add(Convert.ToDouble(TableData2[sectionResult + i * 14 + 4]));
@@ -882,48 +883,68 @@ namespace SectionCutter
                     loadCaseResults.M3 = M3loop.ToArray();
                     listSectionResults.Add(loadCaseResults);
                 }
-
             }
 
             else
             {
-                ;
+                int NumberResults = 1;
+                string[] SCut = new string[0];
+                string[] LoadCase = new string[0];
+                string[] StepType = new string[0];
+                double[] StepNum = new double[0];
+                double[] F1 = new double[0];
+                double[] F2 = new double[0];
+                double[] F3 = new double[0];
+                double[] M1 = new double[0];
+                double[] M2 = new double[0];
+                double[] M3 = new double[0];
+
+                _SapModel.Results.SectionCutAnalysis(ref NumberResults, ref SCut, ref LoadCase, ref StepType, ref StepNum, ref F1, ref F2, ref F3, ref M1, ref M2, ref M3);
+
+                SectionResults sectionResults = new SectionResults();
+                sectionResults.F1 = F1;
+                sectionResults.F2 = F2;
+                sectionResults.F3 = F3;
+                sectionResults.M1 = M1;
+                sectionResults.M2 = M2;
+                sectionResults.M3 = M3;
             }
-            int NumberResults = 1;
-            string[] SCut = new string[0];
-            string[] LoadCase = new string[0];
-            string[] StepType = new string[0];
-            double[] StepNum = new double[0];
-            double[] F1 = new double[0];
-            double[] F2 = new double[0];
-            double[] F3 = new double[0];
-            double[] M1 = new double[0];
-            double[] M2 = new double[0];
-            double[] M3 = new double[0];
+            //int NumberResults = 1;
+            //string[] SCut = new string[0];
+            //string[] LoadCase = new string[0];
+            //string[] StepType = new string[0];
+            //double[] StepNum = new double[0];
+            //double[] F1 = new double[0];
+            //double[] F2 = new double[0];
+            //double[] F3 = new double[0];
+            //double[] M1 = new double[0];
+            //double[] M2 = new double[0];
+            //double[] M3 = new double[0];
 
-            _SapModel.Results.SectionCutAnalysis(ref NumberResults, ref SCut, ref LoadCase, ref StepType, ref StepNum, ref F1, ref F2, ref F3, ref M1, ref M2, ref M3);
+            //_SapModel.Results.SectionCutAnalysis(ref NumberResults, ref SCut, ref LoadCase, ref StepType, ref StepNum, ref F1, ref F2, ref F3, ref M1, ref M2, ref M3);
 
-            SectionResults sectionResults = new SectionResults();
-            sectionResults.F1 = F1;
-            sectionResults.F2 = F2;
-            sectionResults.F3 = F3;
-            sectionResults.M1 = M1;
-            sectionResults.M2 = M2;
-            sectionResults.M3 = M3;
+            //SectionResults sectionResults = new SectionResults();
+            //sectionResults.F1 = F1;
+            //sectionResults.F2 = F2;
+            //sectionResults.F3 = F3;
+            //sectionResults.M1 = M1;
+            //sectionResults.M2 = M2;
+            //sectionResults.M3 = M3;
 
 
 
-            List<TabularData> TabDataList = new List<TabularData>();
-            for (int i = 0; i < sectionResults.F2.Length; i++)
-            {
-                TabularData sampleData = new TabularData();
-                sampleData.Location = range_values[i];
-                sampleData.Shear = sectionResults.F1[i];
-                sampleData.Moment = sectionResults.M3[i];
-                sampleData.Axial = sectionResults.F2[i];
+            //List<TabularData> TabDataList = new List<TabularData>();
 
-                TabDataList.Add(sampleData);
-            }
+            //for (int i = 0; i < sectionResults.F2.Length; i++)
+            //{
+            //    TabularData sampleData = new TabularData();
+            //    sampleData.Location = range_values[i];
+            //    sampleData.Shear = sectionResults.F1[i];
+            //    sampleData.Moment = sectionResults.M3[i];
+            //    sampleData.Axial = sectionResults.F2[i];
+
+            //    TabDataList.Add(sampleData);
+            //}
 
             //// Setting Up Unit Titles //////
 
@@ -945,27 +966,39 @@ namespace SectionCutter
 
             ////// Shear ScatterPlot //////////
             ///
-            ChartValues<LiveCharts.Defaults.ObservablePoint> shearPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
 
-            for (int i = 0; i < sectionResults.F1.Length; i++)
+            //ChartValues<LiveCharts.Defaults.ObservablePoint> shearPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
+
+            //for (int i = 0; i < sectionResults.F1.Length; i++)
+            //{
+            //    shearPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = range_values[i], Y = sectionResults.F1[i] });
+
+            //}
+
+            //var scatterShearSeries = new LiveCharts.Wpf.LineSeries
+            //{
+            //    Title = "ShearSeries",
+            //    Values = shearPoints,
+            //    Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
+            //    Fill = System.Windows.Media.Brushes.Transparent,
+
+
+            //};
+
+            for (int i = 0; i < listBoxLoadSteps.Items.Count; i++)
             {
-                shearPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = range_values[i], Y = sectionResults.F1[i] });
-
+                listBoxLoadSteps.SetSelected(i, true);
             }
 
-            var scatterShearSeries = new LiveCharts.Wpf.LineSeries
+            List<string> mySelectedCases = new List<string>();
+            foreach (var selectedItem in listBoxLoadSteps.SelectedItems)
             {
-                Title = "ShearSeries",
-                Values = shearPoints,
-                Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
-                Fill = System.Windows.Media.Brushes.Transparent,
+                mySelectedCases.Add(selectedItem.ToString());
+            }
+            PlotResults.GraphShearResults(listSectionResults, mySelectedCases, range_values, shearScatterPlot);
 
-
-            };
-
-
-            scatterPlot.AxisX.Clear();
-            scatterPlot.AxisX.Add(new LiveCharts.Wpf.Axis
+            shearScatterPlot.AxisX.Clear();
+            shearScatterPlot.AxisX.Add(new LiveCharts.Wpf.Axis
             {
                 Title = titleLocation,
                 Separator = new LiveCharts.Wpf.Separator
@@ -976,8 +1009,8 @@ namespace SectionCutter
                 }
 
             }); ;
-            scatterPlot.AxisY.Clear();
-            scatterPlot.AxisY.Add(new LiveCharts.Wpf.Axis
+            shearScatterPlot.AxisY.Clear();
+            shearScatterPlot.AxisY.Add(new LiveCharts.Wpf.Axis
             {
                 Title = titleShear,
                 Separator = new LiveCharts.Wpf.Separator
@@ -990,36 +1023,36 @@ namespace SectionCutter
 
             });
 
-            scatterPlot.Series.Add(scatterShearSeries);
+            //shearScatterPlot.Series.Add(scatterShearSeries);
 
             //scatterPlot.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(245, 245, 245));
-            scatterPlot.Zoom = LiveCharts.ZoomingOptions.Xy;
+            shearScatterPlot.Zoom = LiveCharts.ZoomingOptions.Xy;
 
             ////// Moment ScatterPlot //////////
 
 
 
 
-            ChartValues<LiveCharts.Defaults.ObservablePoint> momentPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
+            //ChartValues<LiveCharts.Defaults.ObservablePoint> momentPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
 
-            for (int i = 0; i < sectionResults.M3.Length; i++)
-            {
+            //for (int i = 0; i < sectionResults.M3.Length; i++)
+            //{
 
-                momentPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = range_values[i], Y = sectionResults.M3[i] });
-            }
-
-
-            var scatterMomentSeries = new LiveCharts.Wpf.LineSeries
-            {
-                Title = titleMoment,
-                Values = momentPoints,
-                Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
-                Fill = System.Windows.Media.Brushes.Transparent,
+            //    momentPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = range_values[i], Y = sectionResults.M3[i] });
+            //}
 
 
-            };
+            //var scatterMomentSeries = new LiveCharts.Wpf.LineSeries
+            //{
+            //    Title = titleMoment,
+            //    Values = momentPoints,
+            //    Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
+            //    Fill = System.Windows.Media.Brushes.Transparent,
 
 
+            //};
+
+            PlotResults.GraphMomentResults(listSectionResults, mySelectedCases, range_values, momentScatterPlot);
             momentScatterPlot.AxisX.Clear();
             momentScatterPlot.AxisX.Add(new LiveCharts.Wpf.Axis
             {
@@ -1046,7 +1079,7 @@ namespace SectionCutter
 
             });
 
-            momentScatterPlot.Series.Add(scatterMomentSeries);
+            //momentScatterPlot.Series.Add(scatterMomentSeries);
             momentScatterPlot.Zoom = LiveCharts.ZoomingOptions.Xy;
 
             ////// Location Plot //////////
@@ -1093,7 +1126,7 @@ namespace SectionCutter
                 locationPlot.Series.Add(cutSeries);
             }
 
-            dataGridView3.DataSource = TabDataList;
+            //dataGridView3.DataSource = TabDataList;
 
         }
 

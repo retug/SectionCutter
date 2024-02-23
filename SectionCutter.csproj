@@ -71,6 +71,7 @@
     <Compile Include="Class1.cs" />
     <Compile Include="DatabaseTableResult.cs" />
     <Compile Include="LoadCase.cs" />
+    <Compile Include="PlotResults.cs" />
     <Compile Include="Point_Global_Coordinate.cs" />
     <Compile Include="RayCasting.cs" />
     <Compile Include="SectionCutResults.cs" />

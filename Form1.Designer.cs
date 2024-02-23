@@ -46,7 +46,7 @@ namespace SectionCutter
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.dataGridView3 = new System.Windows.Forms.DataGridView();
             this.runAnalysisBtn = new System.Windows.Forms.Button();
-            this.scatterPlot = new LiveCharts.WinForms.CartesianChart();
+            this.shearScatterPlot = new LiveCharts.WinForms.CartesianChart();
             this.momentScatterPlot = new LiveCharts.WinForms.CartesianChart();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.locationPlot = new LiveCharts.WinForms.CartesianChart();
@@ -60,6 +60,7 @@ namespace SectionCutter
             this.label7 = new System.Windows.Forms.Label();
             this.Area_Label = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
+            this.listBoxLoadSteps = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -86,7 +87,6 @@ namespace SectionCutter
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.Size = new System.Drawing.Size(233, 57);
             this.dataGridView1.TabIndex = 1;
-            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // vectorX
             // 
@@ -95,7 +95,6 @@ namespace SectionCutter
             this.vectorX.Size = new System.Drawing.Size(100, 20);
             this.vectorX.TabIndex = 2;
             this.vectorX.Text = "Enter X Value";
-            this.vectorX.TextChanged += new System.EventHandler(this.vectorX_TextChanged_1);
             this.vectorX.Enter += new System.EventHandler(this.vectorX_Enter);
             this.vectorX.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.vectorX_KeyPress);
             this.vectorX.Leave += new System.EventHandler(this.vectorX_TextChanged);
@@ -117,7 +116,7 @@ namespace SectionCutter
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(38, 566);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(101, 16);
+            this.label1.Size = new System.Drawing.Size(100, 16);
             this.label1.TabIndex = 4;
             this.label1.Text = "Section Cut Plot";
             // 
@@ -178,7 +177,6 @@ namespace SectionCutter
             this.NumSlices.Size = new System.Drawing.Size(154, 20);
             this.NumSlices.TabIndex = 9;
             this.NumSlices.Text = "Number of Sections";
-            this.NumSlices.TextChanged += new System.EventHandler(this.NumSlices_TextChanged);
             this.NumSlices.Enter += new System.EventHandler(this.NumSlices_Enter);
             this.NumSlices.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.numSlices_KeyPress);
             this.NumSlices.Leave += new System.EventHandler(this.NumSlices_Leave);
@@ -234,14 +232,14 @@ namespace SectionCutter
             this.runAnalysisBtn.UseVisualStyleBackColor = false;
             this.runAnalysisBtn.Click += new System.EventHandler(this.runAnalysis_Click);
             // 
-            // scatterPlot
+            // shearScatterPlot
             // 
-            this.scatterPlot.Location = new System.Drawing.Point(15, 22);
-            this.scatterPlot.Name = "scatterPlot";
-            this.scatterPlot.Size = new System.Drawing.Size(1132, 262);
-            this.scatterPlot.TabIndex = 14;
-            this.scatterPlot.Text = "Units";
-            this.scatterPlot.Visible = false;
+            this.shearScatterPlot.Location = new System.Drawing.Point(15, 35);
+            this.shearScatterPlot.Name = "shearScatterPlot";
+            this.shearScatterPlot.Size = new System.Drawing.Size(1132, 262);
+            this.shearScatterPlot.TabIndex = 14;
+            this.shearScatterPlot.Text = "Units";
+            this.shearScatterPlot.Visible = false;
             // 
             // momentScatterPlot
             // 
@@ -261,7 +259,7 @@ namespace SectionCutter
             this.groupBox3.Controls.Add(this.label5);
             this.groupBox3.Controls.Add(this.label1);
             this.groupBox3.Controls.Add(this.momentScatterPlot);
-            this.groupBox3.Controls.Add(this.scatterPlot);
+            this.groupBox3.Controls.Add(this.shearScatterPlot);
             this.groupBox3.Controls.Add(this.dataGridView3);
             this.groupBox3.Location = new System.Drawing.Point(33, 141);
             this.groupBox3.Name = "groupBox3";
@@ -285,7 +283,7 @@ namespace SectionCutter
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4.Location = new System.Drawing.Point(38, 16);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(92, 16);
+            this.label4.Size = new System.Drawing.Size(91, 16);
             this.label4.TabIndex = 4;
             this.label4.Text = "Shear Results";
             // 
@@ -295,7 +293,7 @@ namespace SectionCutter
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.Location = new System.Drawing.Point(38, 291);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(104, 16);
+            this.label3.Size = new System.Drawing.Size(103, 16);
             this.label3.TabIndex = 4;
             this.label3.Text = "Moment Results";
             // 
@@ -305,7 +303,7 @@ namespace SectionCutter
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Underline);
             this.label5.Location = new System.Drawing.Point(600, 566);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(87, 16);
+            this.label5.Size = new System.Drawing.Size(86, 16);
             this.label5.TabIndex = 4;
             this.label5.Text = "Tabular Data";
             // 
@@ -382,11 +380,21 @@ namespace SectionCutter
             this.label9.TabIndex = 18;
             this.label9.Text = "Areas";
             // 
+            // listBoxLoadSteps
+            // 
+            this.listBoxLoadSteps.FormattingEnabled = true;
+            this.listBoxLoadSteps.Location = new System.Drawing.Point(991, 89);
+            this.listBoxLoadSteps.Name = "listBoxLoadSteps";
+            this.listBoxLoadSteps.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
+            this.listBoxLoadSteps.Size = new System.Drawing.Size(189, 56);
+            this.listBoxLoadSteps.TabIndex = 19;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1215, 982);
+            this.ClientSize = new System.Drawing.Size(1373, 982);
+            this.Controls.Add(this.listBoxLoadSteps);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.Area_Label);
             this.Controls.Add(this.label7);
@@ -439,7 +447,7 @@ namespace SectionCutter
         private System.Windows.Forms.DataGridView dataGridView2;
         private System.Windows.Forms.DataGridView dataGridView3;
         private System.Windows.Forms.Button runAnalysisBtn;
-        private LiveCharts.WinForms.CartesianChart scatterPlot;
+        private LiveCharts.WinForms.CartesianChart shearScatterPlot;
         private LiveCharts.WinForms.CartesianChart momentScatterPlot;
         private System.Windows.Forms.GroupBox groupBox3;
         private LiveCharts.WinForms.CartesianChart locationPlot;
@@ -454,5 +462,6 @@ namespace SectionCutter
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label Area_Label;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.ListBox listBoxLoadSteps;
     }
 }
