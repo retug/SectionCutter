@@ -388,6 +388,7 @@ namespace SectionCutter
             this.listBoxLoadSteps.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
             this.listBoxLoadSteps.Size = new System.Drawing.Size(189, 56);
             this.listBoxLoadSteps.TabIndex = 19;
+            
             // 
             // Form1
             // 

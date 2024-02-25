@@ -19,18 +19,21 @@ namespace SectionCutter
         //shear chart = cartiesian chart for chart of interest
         public static void GraphShearResults(List<SectionResults> listResults, List<string> SelectedObjects, double[] rangeofvalues, LiveCharts.WinForms.CartesianChart shearChart) 
         {
+            shearChart.Series.Clear();
             List< ChartValues < LiveCharts.Defaults.ObservablePoint >> plottingPoints = new List<ChartValues<LiveCharts.Defaults.ObservablePoint>> ();
             for (int i = 0; i < SelectedObjects.Count; i++)
             {
+                int mySelectedDirection = 0;
+                mySelectedDirection = listResults.FindIndex(x => x.LoadDirection == SelectedObjects[i]);
                 ChartValues<LiveCharts.Defaults.ObservablePoint> shearPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
-                for (int j = 0; j < listResults[i].F1.Length; j++)
+                for (int j = 0; j < listResults[mySelectedDirection].F1.Length; j++)
                 {
-                    shearPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = rangeofvalues[j], Y = listResults[i].F1[j] });
+                    shearPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = rangeofvalues[j], Y = listResults[mySelectedDirection].F1[j] });
                 }
 
                 var scatterShearSeries = new LiveCharts.Wpf.LineSeries
                 {
-                    Title = SelectedObjects[i], //this will need to be written, map to name of load case selected.
+                    Title = listResults[mySelectedDirection].LoadDirection, //this will need to be written, map to name of load case selected.
                     Values = shearPoints,
                     Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
                     Fill = System.Windows.Media.Brushes.Transparent,
@@ -43,18 +46,20 @@ namespace SectionCutter
 
         public static void GraphMomentResults(List<SectionResults> listResults, List<string> SelectedObjects, double[] rangeofvalues, LiveCharts.WinForms.CartesianChart momentChart)
         {
+            momentChart.Series.Clear();
             List<ChartValues<LiveCharts.Defaults.ObservablePoint>> plottingPoints = new List<ChartValues<LiveCharts.Defaults.ObservablePoint>>();
             for (int i = 0; i < SelectedObjects.Count; i++)
             {
+                int mySelectedDirection = listResults.FindIndex(x => x.LoadDirection == SelectedObjects[i]);
                 ChartValues<LiveCharts.Defaults.ObservablePoint> momentPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
-                for (int j = 0; j < listResults[i].F1.Length; j++)
+                for (int j = 0; j < listResults[mySelectedDirection].F1.Length; j++)
                 {
-                    momentPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = rangeofvalues[j], Y = listResults[i].M3[j] });
+                    momentPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = rangeofvalues[j], Y = listResults[mySelectedDirection].M3[j] });
                 }
 
                 var scatterShearSeries = new LiveCharts.Wpf.LineSeries
                 {
-                    Title = SelectedObjects[i], //this will need to be written, map to name of load case selected.
+                    Title = listResults[mySelectedDirection].LoadDirection, //this will need to be written, map to name of load case selected.
                     Values = momentPoints,
                     Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
                     Fill = System.Windows.Media.Brushes.Transparent,

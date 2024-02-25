@@ -19,6 +19,8 @@ namespace SectionCutter
 		public double[] M1 { get; set; }
 		public double[] M2 { get; set; }
 		public double[] M3 { get; set; }
+		public string LoadDirection { get; set; }
+
 
 	}
 

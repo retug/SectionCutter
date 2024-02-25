@@ -19,6 +19,7 @@ using System.Windows;
 using MessageBox = System.Windows.Forms.MessageBox;
 using LiveCharts.Helpers;
 using System.Windows.Controls;
+using System.Xml.Linq;
 
 namespace SectionCutter
 {
@@ -55,6 +56,9 @@ namespace SectionCutter
         VectorValue vectorXValue = new VectorValue();
         VectorValue vectorYValue = new VectorValue();
         List<string> selectedLoadSteps;
+
+        private List<SectionResults> listSectionResults;
+        private double[] range_values;
 
 
 
@@ -96,6 +100,18 @@ namespace SectionCutter
         {
             // must include a call to finish()
             _Plugin.Finish(0);
+        }
+
+        static int FindFirstIndex(List<string> list, string searchString)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i] == searchString)
+                {
+                    return i; // Return the index if the string is found
+                }
+            }
+            return -1; // Return -1 if the string is not found in the list
         }
 
         private void ShowLoadCase_Load(object sender, EventArgs e)
@@ -167,13 +183,22 @@ namespace SectionCutter
                                 string[] TableData = null;
                                 _SapModel.DatabaseTables.GetTableForDisplayArray(myTableKey, ref FieldKeyList, GroupName, ref TableVersion, ref FieldsKeysIncluded, ref NumberRecords, ref TableData);
 
-                                string[] seismicInfo = new string[6]; // Assuming you want 6 elements (index 2 to 7 inclusive)
-                                Array.Copy(TableData, 2, seismicInfo, 0, 6); // Copies 6 elements starting from index 2
+                                //string[] seismicInfo = new string[6]; // Assuming you want 6 elements (index 2 to 7 inclusive)
+                                List<string> seismicInfo = new List<string>();
+                                int indexofinterest = FindFirstIndex(TableData.ToList(), Name);
+
+                                for (int z = indexofinterest; z < indexofinterest + 6; z++)
+                                {
+                                    seismicInfo.Add(TableData.ToList()[z+2]);
+                                }
+
+                                //Array.Copy(TableData, 2, seismicInfo, indexofinterest, indexofinterest + 6); // Copies 6 elements starting from index 2
 
                                 string[] SeismicName = { "EQx", "EQx + E", "EQx - E", "EQy", "EQy + E", "EQy - E" };
 
                                 // Create the dictionary, this contains what type of loads are included.
                                 LComb.SeismicInfo = new Dictionary<string, bool>();
+                                List<string> seismicDir = new List<string>();
 
                                 // Populate the dictionary
                                 for (int j = 0; j < SeismicName.Length; j++)
@@ -182,12 +207,16 @@ namespace SectionCutter
                                     if (seismicInfo[j] == "Yes")
                                     {
                                         seis = true;
+                                        seismicDir.Add(SeismicName[j]);
+                                        //LComb.SeismicLoadDirection is a list that will contain only the load directions that exist
                                     }
                                     else
                                     {
                                         seis = false;
+                                        
                                     }
                                     LComb.SeismicInfo.Add(SeismicName[j], seis);
+                                    LComb.SeismicLoadDirection = seismicDir;
                                 }
                             }
                             else if (CodeName == "ASCE 7-22")
@@ -201,8 +230,14 @@ namespace SectionCutter
                                 string[] TableData = null;
                                 _SapModel.DatabaseTables.GetTableForDisplayArray(myTableKey, ref FieldKeyList, GroupName, ref TableVersion, ref FieldsKeysIncluded, ref NumberRecords, ref TableData);
 
-                                string[] seismicInfo = new string[6]; // Assuming you want 6 elements (index 2 to 7 inclusive)
-                                Array.Copy(TableData, 2, seismicInfo, 0, 6); // Copies 6 elements starting from index 2
+                                List<string> seismicInfo = new List<string>();
+                                int indexofinterest = FindFirstIndex(TableData.ToList(), Name);
+
+                                for (int z = indexofinterest; z < indexofinterest + 6; z++)
+                                {
+                                    seismicInfo.Add(TableData.ToList()[z]);
+                                }
+
 
 
                                 string[] SeismicName = { "EQx", "EQx + E", "EQx - E", "EQy", "EQy + E", "EQy - E" };
@@ -496,6 +531,9 @@ namespace SectionCutter
             {
                 selectedLoadSteps.Add(item.ToString());
             }
+            PlotResults.GraphShearResults(listSectionResults, selectedLoadSteps, range_values, shearScatterPlot);
+            PlotResults.GraphMomentResults(listSectionResults, selectedLoadSteps, range_values, momentScatterPlot);
+
         }
 
         //static List<int> FindIndices(string[] array, string value)
@@ -721,7 +759,7 @@ namespace SectionCutter
             double height = ref_Point.Z;
 
             // creates a list of values between max and min u values.
-            double[] range_values = linspace(Umin + 1, Umax - 1, n_cuts);
+            range_values = linspace(Umin + 1, Umax - 1, n_cuts);
 
 
             //creates the lists of 4 points
@@ -838,7 +876,7 @@ namespace SectionCutter
 
             _SapModel.DatabaseTables.GetTableForDisplayArray(TableKey3, ref FieldKeyList, GroupName, ref TableVersion, ref FieldKeysIncluded2, ref NumRecords, ref TableData2);
             //THIS IS THE LIST TO HOLD ALL LOAD STEP RESULTS FOR A SELECTED LOAD CASE WITH STEPS
-            List<SectionResults> listSectionResults = new List<SectionResults>();
+            listSectionResults = new List<SectionResults>();
 
             //this is the multiple load steps
             if (FieldKeysIncluded2.Contains("StepNumber"))
@@ -853,6 +891,8 @@ namespace SectionCutter
                 //int step = indices.Count() / loadSteps;
                 // Grab specific items by index using LINQ
                 var specificItems = indices.Where((item, index2) => index2 % loadSteps == 0);
+                List<string> OrderedSeismicList = new List<string>();
+                OrderedSeismicList = LoadCaseList[index].GetOrderedSeismicDirections();
 
                 //run from 0 to load steps
                 for (int i  = 0; i < loadSteps; i++)
@@ -865,6 +905,13 @@ namespace SectionCutter
                     List<Double> M3loop = new List<double>();
                     //IF THIS TABLE GETS REWORKED IN THE FUTURE, THIS WILL NEED TO BE RECODED!!!
                     SectionResults loadCaseResults = new SectionResults();
+                    //AREA OF INTEREST
+
+
+
+                    //note index is the corresponding loadcase selected in the LoadCaseList
+                    //This is Eq X, Eq X e+ etc.
+                    loadCaseResults.LoadDirection = OrderedSeismicList[i];
                     //We generatate all of the results for an individual load case, load step in this loop here.
                     foreach (int sectionResult in specificItems)
                     {
@@ -984,11 +1031,15 @@ namespace SectionCutter
 
 
             //};
-
+            listBoxLoadSteps.SelectedIndexChanged -= ListBox_SelectedIndexChanged;
             for (int i = 0; i < listBoxLoadSteps.Items.Count; i++)
             {
+                // Remove the SelectionChangeCommitted event handler
+                
                 listBoxLoadSteps.SetSelected(i, true);
             }
+
+            listBoxLoadSteps.SelectedIndexChanged += ListBox_SelectedIndexChanged;
 
             List<string> mySelectedCases = new List<string>();
             foreach (var selectedItem in listBoxLoadSteps.SelectedItems)
@@ -1140,7 +1191,14 @@ namespace SectionCutter
             US_Units.Checked = false;
         }
 
-
+        //private void listBoxLoadSteps_SelectedIndexChanged(object sender, EventArgs e)
+        //{
+        //    List<string> selectedResults = new List<string>();
+        //    foreach (var selectedItem in listBoxLoadSteps.SelectedItems)
+        //    {
+        //        selectedResults.Add(selectedItem.ToString());
+        //    }
+        //}
     }
 }
 
