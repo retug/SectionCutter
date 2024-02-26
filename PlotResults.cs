@@ -20,53 +20,106 @@ namespace SectionCutter
         public static void GraphShearResults(List<SectionResults> listResults, List<string> SelectedObjects, double[] rangeofvalues, LiveCharts.WinForms.CartesianChart shearChart) 
         {
             shearChart.Series.Clear();
-            List< ChartValues < LiveCharts.Defaults.ObservablePoint >> plottingPoints = new List<ChartValues<LiveCharts.Defaults.ObservablePoint>> ();
-            for (int i = 0; i < SelectedObjects.Count; i++)
+            if (SelectedObjects.Count <= 1)
             {
-                int mySelectedDirection = 0;
-                mySelectedDirection = listResults.FindIndex(x => x.LoadDirection == SelectedObjects[i]);
-                ChartValues<LiveCharts.Defaults.ObservablePoint> shearPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
-                for (int j = 0; j < listResults[mySelectedDirection].F1.Length; j++)
+                List<ChartValues<LiveCharts.Defaults.ObservablePoint>> plottingPoints = new List<ChartValues<LiveCharts.Defaults.ObservablePoint>>();
+                for (int i = 0; i < SelectedObjects.Count; i++)
                 {
-                    shearPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = rangeofvalues[j], Y = listResults[mySelectedDirection].F1[j] });
+                    ChartValues<LiveCharts.Defaults.ObservablePoint> shearPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
+                    for (int j = 0; j < listResults[0].F1.Length; j++)
+                    {
+                        shearPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = rangeofvalues[j], Y = listResults[0].F1[j] });
+                    }
+
+                    var scatterShearSeries = new LiveCharts.Wpf.LineSeries
+                    {
+                        Title = listResults[0].LoadDirection, //this will need to be written, map to name of load case selected.
+                        Values = shearPoints,
+                        Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
+                        Fill = System.Windows.Media.Brushes.Transparent,
+
+
+                    };
+                    shearChart.Series.Add(scatterShearSeries);
                 }
-
-                var scatterShearSeries = new LiveCharts.Wpf.LineSeries
-                {
-                    Title = listResults[mySelectedDirection].LoadDirection, //this will need to be written, map to name of load case selected.
-                    Values = shearPoints,
-                    Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
-                    Fill = System.Windows.Media.Brushes.Transparent,
-
-
-                };
-                shearChart.Series.Add(scatterShearSeries);
             }
+            else
+            {
+                List<ChartValues<LiveCharts.Defaults.ObservablePoint>> plottingPoints = new List<ChartValues<LiveCharts.Defaults.ObservablePoint>>();
+                for (int i = 0; i < SelectedObjects.Count; i++)
+                {
+                    int mySelectedDirection = 0;
+                    mySelectedDirection = listResults.FindIndex(x => x.LoadDirection == SelectedObjects[i]);
+                    ChartValues<LiveCharts.Defaults.ObservablePoint> shearPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
+                    for (int j = 0; j < listResults[mySelectedDirection].F1.Length; j++)
+                    {
+                        shearPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = rangeofvalues[j], Y = listResults[mySelectedDirection].F1[j] });
+                    }
+
+                    var scatterShearSeries = new LiveCharts.Wpf.LineSeries
+                    {
+                        Title = listResults[mySelectedDirection].LoadDirection, //this will need to be written, map to name of load case selected.
+                        Values = shearPoints,
+                        Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
+                        Fill = System.Windows.Media.Brushes.Transparent,
+
+
+                    };
+                    shearChart.Series.Add(scatterShearSeries);
+                }
+            }
+
         }
 
         public static void GraphMomentResults(List<SectionResults> listResults, List<string> SelectedObjects, double[] rangeofvalues, LiveCharts.WinForms.CartesianChart momentChart)
         {
             momentChart.Series.Clear();
-            List<ChartValues<LiveCharts.Defaults.ObservablePoint>> plottingPoints = new List<ChartValues<LiveCharts.Defaults.ObservablePoint>>();
-            for (int i = 0; i < SelectedObjects.Count; i++)
+            if (SelectedObjects.Count <= 1)
             {
-                int mySelectedDirection = listResults.FindIndex(x => x.LoadDirection == SelectedObjects[i]);
-                ChartValues<LiveCharts.Defaults.ObservablePoint> momentPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
-                for (int j = 0; j < listResults[mySelectedDirection].F1.Length; j++)
+                List<ChartValues<LiveCharts.Defaults.ObservablePoint>> plottingPoints = new List<ChartValues<LiveCharts.Defaults.ObservablePoint>>();
+                for (int i = 0; i < SelectedObjects.Count; i++)
                 {
-                    momentPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = rangeofvalues[j], Y = listResults[mySelectedDirection].M3[j] });
+                    ChartValues<LiveCharts.Defaults.ObservablePoint> momentPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
+                    for (int j = 0; j < listResults[0].F1.Length; j++)
+                    {
+                        momentPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = rangeofvalues[j], Y = listResults[0].M3[j] });
+                    }
+
+                    var scatterShearSeries = new LiveCharts.Wpf.LineSeries
+                    {
+                        Title = listResults[0].LoadDirection, //this will need to be written, map to name of load case selected.
+                        Values = momentPoints,
+                        Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
+                        Fill = System.Windows.Media.Brushes.Transparent,
+
+
+                    };
+                    momentChart.Series.Add(scatterShearSeries);
                 }
-
-                var scatterShearSeries = new LiveCharts.Wpf.LineSeries
+            }
+            else
+            {
+                List<ChartValues<LiveCharts.Defaults.ObservablePoint>> plottingPoints = new List<ChartValues<LiveCharts.Defaults.ObservablePoint>>();
+                for (int i = 0; i < SelectedObjects.Count; i++)
                 {
-                    Title = listResults[mySelectedDirection].LoadDirection, //this will need to be written, map to name of load case selected.
-                    Values = momentPoints,
-                    Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
-                    Fill = System.Windows.Media.Brushes.Transparent,
+                    int mySelectedDirection = listResults.FindIndex(x => x.LoadDirection == SelectedObjects[i]);
+                    ChartValues<LiveCharts.Defaults.ObservablePoint> momentPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
+                    for (int j = 0; j < listResults[mySelectedDirection].F1.Length; j++)
+                    {
+                        momentPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = rangeofvalues[j], Y = listResults[mySelectedDirection].M3[j] });
+                    }
+
+                    var scatterShearSeries = new LiveCharts.Wpf.LineSeries
+                    {
+                        Title = listResults[mySelectedDirection].LoadDirection, //this will need to be written, map to name of load case selected.
+                        Values = momentPoints,
+                        Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
+                        Fill = System.Windows.Media.Brushes.Transparent,
 
 
-                };
-                momentChart.Series.Add(scatterShearSeries);
+                    };
+                    momentChart.Series.Add(scatterShearSeries);
+                }
             }
         }
     }

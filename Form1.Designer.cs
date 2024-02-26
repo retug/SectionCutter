@@ -61,6 +61,7 @@ namespace SectionCutter
             this.Area_Label = new System.Windows.Forms.Label();
             this.label9 = new System.Windows.Forms.Label();
             this.listBoxLoadSteps = new System.Windows.Forms.ListBox();
+            this.listBoxResultSelected = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -213,7 +214,7 @@ namespace SectionCutter
             // dataGridView3
             // 
             this.dataGridView3.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView3.Location = new System.Drawing.Point(603, 600);
+            this.dataGridView3.Location = new System.Drawing.Point(603, 610);
             this.dataGridView3.Name = "dataGridView3";
             this.dataGridView3.Size = new System.Drawing.Size(544, 186);
             this.dataGridView3.TabIndex = 11;
@@ -253,6 +254,7 @@ namespace SectionCutter
             // groupBox3
             // 
             this.groupBox3.BackColor = System.Drawing.Color.Transparent;
+            this.groupBox3.Controls.Add(this.listBoxResultSelected);
             this.groupBox3.Controls.Add(this.locationPlot);
             this.groupBox3.Controls.Add(this.label4);
             this.groupBox3.Controls.Add(this.label3);
@@ -270,7 +272,7 @@ namespace SectionCutter
             // 
             // locationPlot
             // 
-            this.locationPlot.Location = new System.Drawing.Point(15, 585);
+            this.locationPlot.Location = new System.Drawing.Point(15, 591);
             this.locationPlot.Name = "locationPlot";
             this.locationPlot.Size = new System.Drawing.Size(582, 211);
             this.locationPlot.TabIndex = 14;
@@ -388,13 +390,20 @@ namespace SectionCutter
             this.listBoxLoadSteps.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
             this.listBoxLoadSteps.Size = new System.Drawing.Size(189, 56);
             this.listBoxLoadSteps.TabIndex = 19;
-            
+            // 
+            // listBoxResultSelected
+            // 
+            this.listBoxResultSelected.FormattingEnabled = true;
+            this.listBoxResultSelected.Location = new System.Drawing.Point(880, 571);
+            this.listBoxResultSelected.Name = "listBoxResultSelected";
+            this.listBoxResultSelected.Size = new System.Drawing.Size(267, 30);
+            this.listBoxResultSelected.TabIndex = 15;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1373, 982);
+            this.ClientSize = new System.Drawing.Size(1353, 982);
             this.Controls.Add(this.listBoxLoadSteps);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.Area_Label);
@@ -464,5 +473,6 @@ namespace SectionCutter
         private System.Windows.Forms.Label Area_Label;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.ListBox listBoxLoadSteps;
+        private System.Windows.Forms.ListBox listBoxResultSelected;
     }
 }
