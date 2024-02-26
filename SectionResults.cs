@@ -20,6 +20,8 @@ namespace SectionCutter
 		public double[] M2 { get; set; }
 		public double[] M3 { get; set; }
 		public string LoadDirection { get; set; }
+		public double[] SectionLength { get; set; }
+
 
 
 	}
@@ -27,6 +29,7 @@ namespace SectionCutter
 	class TabularData
     {
 		public double Location { get; set; }
+		public double Length { get; set; }
 		public double Shear { get; set; }
 		public double Moment { get; set; }
 		public double Axial { get; set; }

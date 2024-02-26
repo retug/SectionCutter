@@ -62,8 +62,6 @@ namespace SectionCutter
                         Values = shearPoints,
                         Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
                         Fill = System.Windows.Media.Brushes.Transparent,
-
-
                     };
                     shearChart.Series.Add(scatterShearSeries);
                 }

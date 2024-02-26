@@ -59,9 +59,9 @@ namespace SectionCutter
 
         private List<SectionResults> listSectionResults;
         private double[] range_values;
-
-
-
+        List<List<String>> ETABs_Section_Cut_Data = new List<List<String>>();
+        LiveCharts.Wpf.LineSeries cutSeries; // Declare cutSeries outside the loop
+        List<double> sectionCutLength = new List<double>();
 
 
         public Form1(ref cSapModel SapModel, ref cPluginCallback Plugin)
@@ -91,9 +91,7 @@ namespace SectionCutter
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            // do setup things here
             this.Paint -= Form1_Paint;
-
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -401,10 +399,6 @@ namespace SectionCutter
                             AreaPointList.Add(AreaPointObject);
 
                             tempAreaPointList.Add(AreaPointObject);
-
-                            
-
-
                         }
                         AreaPointListStrucIntact.Add(tempAreaPointList);
                     }
@@ -546,6 +540,7 @@ namespace SectionCutter
             {
                 TabularData sampleData = new TabularData();
                 sampleData.Location = range_values[i];
+                sampleData.Length = sectionCutLength[i];
                 sampleData.Shear = listSectionResults[mySelectedResultsInt].F1[i];
                 sampleData.Moment = listSectionResults[mySelectedResultsInt].M3[i];
                 sampleData.Axial = listSectionResults[mySelectedResultsInt].F2[i];
@@ -771,7 +766,9 @@ namespace SectionCutter
 
             //creates the lists of 4 points
             List<List<MyPoint>> sectionPlanes = new List<List<MyPoint>>();
-            List<List<String>> ETABs_Section_Cut_Data = new List<List<String>>();
+            ETABs_Section_Cut_Data = new List<List<String>>();
+
+            sectionCutLength = new List<double>();
 
             /////// Generating all of the data to be utilized to make the section cuts /////
 
@@ -795,6 +792,8 @@ namespace SectionCutter
                 List<double> listPoint2 = new List<double>() { xingPoints[0].X, xingPoints[0].Y, height + 0.5 };
                 List<double> listPoint3 = new List<double>() { xingPoints[1].X, xingPoints[1].Y, height + 0.5 };
                 List<double> listPoint4 = new List<double>() { xingPoints[1].X, xingPoints[1].Y, height - 0.5 };
+
+                sectionCutLength.Add(Math.Sqrt(Math.Pow(xingPoints[1].X - xingPoints[0].X, 2) + Math.Pow(xingPoints[1].Y - xingPoints[0].Y, 2)));
 
 
                 string name = counter.ToString().PadLeft(4, '0');
@@ -962,16 +961,12 @@ namespace SectionCutter
                 sectionResults.M1 = M1;
                 sectionResults.M2 = M2;
                 sectionResults.M3 = M3;
-
+                
                 listSectionResults.Add(sectionResults);
             }
 
-
-
-
             List<TabularData> TabDataList = new List<TabularData>();
 
-            //listBoxLoadSteps.SelectedIndexChanged -= ListBox_SelectedIndexChanged;
             if (listSectionResults.Count > 1 )
             {
                 listBoxResultSelected.SetSelected(0, true);
@@ -982,9 +977,11 @@ namespace SectionCutter
                 {
                     TabularData sampleData = new TabularData();
                     sampleData.Location = range_values[i];
+                    sampleData.Length = sectionCutLength[i];
                     sampleData.Shear = listSectionResults[mySelectedResultsInt].F1[i];
                     sampleData.Moment = listSectionResults[mySelectedResultsInt].M3[i];
                     sampleData.Axial = listSectionResults[mySelectedResultsInt].F2[i];
+                    
 
                     TabDataList.Add(sampleData);
                 }
@@ -998,6 +995,7 @@ namespace SectionCutter
                 {
                     TabularData sampleData = new TabularData();
                     sampleData.Location = range_values[i];
+                    sampleData.Length = sectionCutLength[i];
                     sampleData.Shear = listSectionResults[0].F1[i];
                     sampleData.Moment = listSectionResults[0].M3[i];
                     sampleData.Axial = listSectionResults[0].F2[i];
@@ -1147,7 +1145,6 @@ namespace SectionCutter
                 }
             }
 
-
             for (int i = 0; i < range_values.Count(); i++)
 
             {
@@ -1159,7 +1156,7 @@ namespace SectionCutter
                     Y = Double.Parse(ETABs_Section_Cut_Data[i * 4 + 2][13
                     ])
                 });
-                var cutSeries = new LiveCharts.Wpf.LineSeries
+                cutSeries = new LiveCharts.Wpf.LineSeries
                 {
                     Title = "Cut Locations",
                     Values = cutPoints,
@@ -1169,9 +1166,61 @@ namespace SectionCutter
 
                 locationPlot.Series.Add(cutSeries);
             }
+            dataGridView3.SelectionChanged += dataGridView3_SelectionChanged;
 
-            
+        }
 
+        private void dataGridView3_SelectionChanged(object sender, EventArgs e)
+        {
+            locationPlot.Series.Clear();
+            if (dataGridView3.SelectedRows.Count > 0)
+            {
+                int selectedIndex = dataGridView3.SelectedRows[0].Index;
+                for (int i = 0; i < range_values.Count(); i++)
+                {
+                    ChartValues<LiveCharts.Defaults.ObservablePoint> cutPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
+                    cutPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = Double.Parse(ETABs_Section_Cut_Data[i * 4][12]), Y = Double.Parse(ETABs_Section_Cut_Data[i * 4][13]) });
+                    cutPoints.Add(new LiveCharts.Defaults.ObservablePoint
+                    {
+                        X = Double.Parse(ETABs_Section_Cut_Data[i * 4 + 2][12]),
+                        Y = Double.Parse(ETABs_Section_Cut_Data[i * 4 + 2][13])
+                    });
+
+                    cutSeries = new LiveCharts.Wpf.LineSeries
+                    {
+                        Title = "Cut Locations",
+                        Values = cutPoints,
+                        Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 0, 0)), // Default color
+                        Fill = System.Windows.Media.Brushes.Transparent,
+                    };
+
+                    // Check if the current index matches selectedIndex
+                    if (i == selectedIndex)
+                    {
+                        cutSeries.Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 215, 0)); // Set color to gold
+                    }
+
+                    locationPlot.Series.Add(cutSeries);
+                }
+                for (int i = 0; i < AreaLineListGlo.Count; i++)
+                {
+                    for (int j = 0; j < AreaLineListGlo[i].Count(); j++)
+                    {
+                        ChartValues<LiveCharts.Defaults.ObservablePoint> areaPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();
+                        areaPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = AreaLineListGlo[i][j].startPoint.X, Y = AreaLineListGlo[i][j].startPoint.Y });
+                        areaPoints.Add(new LiveCharts.Defaults.ObservablePoint { X = AreaLineListGlo[i][j].endPoint.X, Y = AreaLineListGlo[i][j].endPoint.Y });
+                        var locationSeries = new LiveCharts.Wpf.LineSeries
+                        {
+                            Title = "Area Locations",
+                            Values = areaPoints,
+                            Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
+                            Fill = System.Windows.Media.Brushes.Transparent,
+                        };
+                        locationPlot.Series.Add(locationSeries);
+                    }
+                }
+
+            }
         }
 
         private void US_Units_CheckedChanged(object sender, EventArgs e)
@@ -1185,4 +1234,3 @@ namespace SectionCutter
         }
     }
 }
-
