@@ -2,7 +2,7 @@
 
 Current issue:
 
-![indexselected](https://github.com/retug/SectionCutter/assets/45467091/0dd975a5-30c5-4594-8ab2-04ca7068e917)
+![indexselected](https://github.com/retug/SectionCutter/assets/45467091/9ced0d17-9bad-4cce-ab25-3d109523af63)
 
 Section Cut Tool to assit engineers in slicing planar diaphragms. Working to actively support, let me know of bugs/program features you want added.
 
