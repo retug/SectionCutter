@@ -62,6 +62,7 @@ namespace SectionCutter
         List<List<String>> ETABs_Section_Cut_Data = new List<List<String>>();
         LiveCharts.Wpf.LineSeries cutSeries; // Declare cutSeries outside the loop
         List<double> sectionCutLength = new List<double>();
+        int mySelectedSectionIndex = 0;
 
 
         public Form1(ref cSapModel SapModel, ref cPluginCallback Plugin)
@@ -525,7 +526,8 @@ namespace SectionCutter
             {
                 selectedLoadSteps.Add(item.ToString());
             }
-            PlotResults.GraphShearResults(listSectionResults, selectedLoadSteps, range_values, shearScatterPlot);
+            
+            PlotResults.GraphShearResults(listSectionResults, selectedLoadSteps, range_values, shearScatterPlot, mySelectedSectionIndex);
             PlotResults.GraphMomentResults(listSectionResults, selectedLoadSteps, range_values, momentScatterPlot);
 
         }
@@ -1005,7 +1007,7 @@ namespace SectionCutter
                 dataGridView3.DataSource = TabDataList;
                 List<String> myTestSelectedCases = new List<String>();
                 myTestSelectedCases.Add("Test");
-                PlotResults.GraphShearResults(listSectionResults, myTestSelectedCases, range_values, shearScatterPlot);
+                PlotResults.GraphShearResults(listSectionResults, myTestSelectedCases, range_values, shearScatterPlot, mySelectedSectionIndex);
                 PlotResults.GraphMomentResults(listSectionResults, myTestSelectedCases, range_values, momentScatterPlot);
 
             }    
@@ -1048,7 +1050,7 @@ namespace SectionCutter
 
             if (mySelectedCases.Count >= 1)
             {
-                PlotResults.GraphShearResults(listSectionResults, mySelectedCases, range_values, shearScatterPlot);
+                PlotResults.GraphShearResults(listSectionResults, mySelectedCases, range_values, shearScatterPlot, mySelectedSectionIndex);
             }
             else
             {

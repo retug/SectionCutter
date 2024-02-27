@@ -4,7 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Media;
 using LiveCharts;
+using LiveCharts.Configurations;
+using LiveCharts.Defaults;
 using LiveCharts.WinForms;
 
 namespace SectionCutter
@@ -17,9 +20,14 @@ namespace SectionCutter
         //SelectedObjects = load steps you want to plot
         //range of values = the coordinates of where the cut is located.
         //shear chart = cartiesian chart for chart of interest
-        public static void GraphShearResults(List<SectionResults> listResults, List<string> SelectedObjects, double[] rangeofvalues, LiveCharts.WinForms.CartesianChart shearChart) 
+
+
+        public static void GraphShearResults(List<SectionResults> listResults, List<string> SelectedObjects, double[] rangeofvalues, LiveCharts.WinForms.CartesianChart shearChart, int givenIndex) 
         {
+            // Define your DangerBrush
             shearChart.Series.Clear();
+            SolidColorBrush DangerBrush = new SolidColorBrush(Color.FromRgb(255,215, 0));
+            
             if (SelectedObjects.Count <= 1)
             {
                 List<ChartValues<LiveCharts.Defaults.ObservablePoint>> plottingPoints = new List<ChartValues<LiveCharts.Defaults.ObservablePoint>>();
@@ -38,8 +46,15 @@ namespace SectionCutter
                         Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
                         Fill = System.Windows.Media.Brushes.Transparent,
 
-
                     };
+                    var Mapper = Mappers.Xy<ObservableValue>()
+                        .X((item, index) => index)
+                        .Y(item => item.Value)
+                        .Fill((item, index) => index == givenIndex ? DangerBrush : null)
+                        .Stroke((item, index) => index == givenIndex ? DangerBrush : null);
+                    scatterShearSeries.Configuration = Mapper;
+
+                    //shearChart.Series.Clear();
                     shearChart.Series.Add(scatterShearSeries);
                 }
             }
@@ -63,10 +78,16 @@ namespace SectionCutter
                         Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
                         Fill = System.Windows.Media.Brushes.Transparent,
                     };
+                    var Mapper = Mappers.Xy<ObservableValue>()
+                        .X((item, index) => index)
+                        .Y(item => item.Value)
+                        .Fill((item, index) => index == givenIndex ? DangerBrush : null)
+                        .Stroke((item, index) => index == givenIndex ? DangerBrush : null);
+                    scatterShearSeries.Configuration = Mapper;
                     shearChart.Series.Add(scatterShearSeries);
+                    
                 }
             }
-
         }
 
         public static void GraphMomentResults(List<SectionResults> listResults, List<string> SelectedObjects, double[] rangeofvalues, LiveCharts.WinForms.CartesianChart momentChart)
