@@ -63,6 +63,7 @@ namespace SectionCutter
         LiveCharts.Wpf.LineSeries cutSeries; // Declare cutSeries outside the loop
         List<double> sectionCutLength = new List<double>();
         int mySelectedSectionIndex = 0;
+        List<string> mySelectedCases = new List<string>();
 
 
         public Form1(ref cSapModel SapModel, ref cPluginCallback Plugin)
@@ -528,7 +529,7 @@ namespace SectionCutter
             }
             
             PlotResults.GraphShearResults(listSectionResults, selectedLoadSteps, range_values, shearScatterPlot, mySelectedSectionIndex);
-            PlotResults.GraphMomentResults(listSectionResults, selectedLoadSteps, range_values, momentScatterPlot);
+            PlotResults.GraphMomentResults(listSectionResults, selectedLoadSteps, range_values, momentScatterPlot, mySelectedSectionIndex);
 
         }
 
@@ -916,7 +917,6 @@ namespace SectionCutter
                     //AREA OF INTEREST
 
 
-
                     //note index is the corresponding loadcase selected in the LoadCaseList
                     //This is Eq X, Eq X e+ etc.
                     loadCaseResults.LoadDirection = OrderedSeismicList[i];
@@ -1008,7 +1008,7 @@ namespace SectionCutter
                 List<String> myTestSelectedCases = new List<String>();
                 myTestSelectedCases.Add("Test");
                 PlotResults.GraphShearResults(listSectionResults, myTestSelectedCases, range_values, shearScatterPlot, mySelectedSectionIndex);
-                PlotResults.GraphMomentResults(listSectionResults, myTestSelectedCases, range_values, momentScatterPlot);
+                PlotResults.GraphMomentResults(listSectionResults, myTestSelectedCases, range_values, momentScatterPlot, mySelectedSectionIndex);
 
             }    
 
@@ -1042,7 +1042,7 @@ namespace SectionCutter
 
             listBoxLoadSteps.SelectedIndexChanged += ListBox_SelectedIndexChanged;
 
-            List<string> mySelectedCases = new List<string>();
+            mySelectedCases = new List<string>();
             foreach (var selectedItem in listBoxLoadSteps.SelectedItems)
             {
                 mySelectedCases.Add(selectedItem.ToString());
@@ -1090,7 +1090,7 @@ namespace SectionCutter
 
             if (mySelectedCases.Count >= 1)
             {
-                PlotResults.GraphMomentResults(listSectionResults, mySelectedCases, range_values, momentScatterPlot);
+                PlotResults.GraphMomentResults(listSectionResults, mySelectedCases, range_values, momentScatterPlot, mySelectedSectionIndex);
             }
             else
             {
@@ -1178,6 +1178,9 @@ namespace SectionCutter
             if (dataGridView3.SelectedRows.Count > 0)
             {
                 int selectedIndex = dataGridView3.SelectedRows[0].Index;
+                //add gold dots
+                PlotResults.GraphShearResults(listSectionResults, mySelectedCases, range_values, shearScatterPlot, selectedIndex);
+                PlotResults.GraphMomentResults(listSectionResults, mySelectedCases, range_values, momentScatterPlot, selectedIndex);
                 for (int i = 0; i < range_values.Count(); i++)
                 {
                     ChartValues<LiveCharts.Defaults.ObservablePoint> cutPoints = new LiveCharts.ChartValues<LiveCharts.Defaults.ObservablePoint>();

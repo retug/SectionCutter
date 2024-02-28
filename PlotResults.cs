@@ -47,11 +47,11 @@ namespace SectionCutter
                         Fill = System.Windows.Media.Brushes.Transparent,
 
                     };
-                    var Mapper = Mappers.Xy<ObservableValue>()
-                        .X((item, index) => index)
-                        .Y(item => item.Value)
-                        .Fill((item, index) => index == givenIndex ? DangerBrush : null)
-                        .Stroke((item, index) => index == givenIndex ? DangerBrush : null);
+                    var Mapper = Mappers.Xy<ObservablePoint>()
+                        .X((value, index) => value.X) // Keep the X value unchanged
+                        .Y((value, index) => value.Y) // Keep the Y value unchanged
+                        .Fill((value, index) => index == givenIndex ? DangerBrush : null)
+                        .Stroke((value, index) => index == givenIndex ? DangerBrush : null);
                     scatterShearSeries.Configuration = Mapper;
 
                     //shearChart.Series.Clear();
@@ -78,11 +78,11 @@ namespace SectionCutter
                         Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
                         Fill = System.Windows.Media.Brushes.Transparent,
                     };
-                    var Mapper = Mappers.Xy<ObservableValue>()
-                        .X((item, index) => index)
-                        .Y(item => item.Value)
-                        .Fill((item, index) => index == givenIndex ? DangerBrush : null)
-                        .Stroke((item, index) => index == givenIndex ? DangerBrush : null);
+                    var Mapper = Mappers.Xy<ObservablePoint>()
+                        .X((value, index) => value.X) // Keep the X value unchanged
+                        .Y((value, index) => value.Y) // Keep the Y value unchanged
+                        .Fill((value, index) => index == givenIndex ? DangerBrush : null)
+                        .Stroke((value, index) => index == givenIndex ? DangerBrush : null);
                     scatterShearSeries.Configuration = Mapper;
                     shearChart.Series.Add(scatterShearSeries);
                     
@@ -90,9 +90,10 @@ namespace SectionCutter
             }
         }
 
-        public static void GraphMomentResults(List<SectionResults> listResults, List<string> SelectedObjects, double[] rangeofvalues, LiveCharts.WinForms.CartesianChart momentChart)
+        public static void GraphMomentResults(List<SectionResults> listResults, List<string> SelectedObjects, double[] rangeofvalues, LiveCharts.WinForms.CartesianChart momentChart, int givenIndex)
         {
             momentChart.Series.Clear();
+            SolidColorBrush DangerBrush = new SolidColorBrush(Color.FromRgb(255, 215, 0));
             if (SelectedObjects.Count <= 1)
             {
                 List<ChartValues<LiveCharts.Defaults.ObservablePoint>> plottingPoints = new List<ChartValues<LiveCharts.Defaults.ObservablePoint>>();
@@ -113,6 +114,12 @@ namespace SectionCutter
 
 
                     };
+                    var Mapper = Mappers.Xy<ObservablePoint>()
+                        .X((value, index) => value.X) // Keep the X value unchanged
+                        .Y((value, index) => value.Y) // Keep the Y value unchanged
+                        .Fill((value, index) => index == givenIndex ? DangerBrush : null)
+                        .Stroke((value, index) => index == givenIndex ? DangerBrush : null);
+                    scatterShearSeries.Configuration = Mapper;
                     momentChart.Series.Add(scatterShearSeries);
                 }
             }
@@ -137,6 +144,12 @@ namespace SectionCutter
 
 
                     };
+                    var Mapper = Mappers.Xy<ObservablePoint>()
+                        .X((value, index) => value.X) // Keep the X value unchanged
+                        .Y((value, index) => value.Y) // Keep the Y value unchanged
+                        .Fill((value, index) => index == givenIndex ? DangerBrush : null)
+                        .Stroke((value, index) => index == givenIndex ? DangerBrush : null);
+                    scatterShearSeries.Configuration = Mapper;
                     momentChart.Series.Add(scatterShearSeries);
                 }
             }

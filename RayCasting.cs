@@ -78,7 +78,6 @@ namespace SectionCutter
                 }
             }
 
-
             double Vmax = xingPntLocal.Max(x => x.Y);
             double Vmin = xingPntLocal.Min(x => x.Y);
 
@@ -93,13 +92,9 @@ namespace SectionCutter
             //returns the max and min v crossings from the algorith
             xingPoints.Add(gloPoint1);
             xingPoints.Add(gloPoint2);
-            
-            
+
             return false;
 
         }
-        
-
-
     }
 }
