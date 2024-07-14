@@ -12,6 +12,7 @@ namespace SectionCutter
         {
             Form1 form = new Form1(ref SapModel, ref ISapPlugin);
             form.Show();
+
         }
 
         public long Info(ref string Text)

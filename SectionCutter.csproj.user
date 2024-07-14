@@ -2,6 +2,6 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartAction>Program</StartAction>
-    <StartProgram>C:\Program Files\Computers and Structures\ETABS 21\ETABS.exe</StartProgram>
+    <StartProgram>C:\Program Files\Computers and Structures\ETABS 22\ETABS.exe</StartProgram>
   </PropertyGroup>
 </Project>
