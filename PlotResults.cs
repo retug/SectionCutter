@@ -41,6 +41,7 @@ namespace SectionCutter
 
                     var scatterShearSeries = new LiveCharts.Wpf.LineSeries
                     {
+                        LineSmoothness = 0, // To make straight lines
                         Title = listResults[0].LoadDirection, //this will need to be written, map to name of load case selected.
                         Values = shearPoints,
                         Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
@@ -73,6 +74,7 @@ namespace SectionCutter
 
                     var scatterShearSeries = new LiveCharts.Wpf.LineSeries
                     {
+                        LineSmoothness = 0, // To make straight lines
                         Title = listResults[mySelectedDirection].LoadDirection, //this will need to be written, map to name of load case selected.
                         Values = shearPoints,
                         Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
@@ -107,6 +109,7 @@ namespace SectionCutter
 
                     var scatterShearSeries = new LiveCharts.Wpf.LineSeries
                     {
+                        LineSmoothness = 0, // To make straight lines
                         Title = listResults[0].LoadDirection, //this will need to be written, map to name of load case selected.
                         Values = momentPoints,
                         Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
@@ -137,6 +140,7 @@ namespace SectionCutter
 
                     var scatterShearSeries = new LiveCharts.Wpf.LineSeries
                     {
+                        LineSmoothness = 0, // To make straight lines
                         Title = listResults[mySelectedDirection].LoadDirection, //this will need to be written, map to name of load case selected.
                         Values = momentPoints,
                         Stroke = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 105)),
