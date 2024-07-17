@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\16142\\Desktop\\Retug\\Own Work\\SectionCutter\\SectionCutter.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\16142\\Desktop\\Retug\\Own Work\\SectionCutter\\SectionCutter.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\16142\\Desktop\\Retug\\Own Work\\SectionCutter\\SectionCutter.csproj",
+        "projectName": "SectionCutter",
+        "projectPath": "C:\\Users\\16142\\Desktop\\Retug\\Own Work\\SectionCutter\\SectionCutter.csproj",
+        "packagesPath": "C:\\Users\\16142\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\16142\\Desktop\\Retug\\Own Work\\SectionCutter\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\16142\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0-windows"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net40": {
+            "targetAlias": "net8.0-windows",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net40": {
+          "targetAlias": "net8.0-windows",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.303\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

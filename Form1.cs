@@ -148,6 +148,7 @@ namespace SectionCutter
                 eLoadCaseType CaseType = new eLoadCaseType();
                 int SubType = 0;
                 eLoadPatternType DesignType = new eLoadPatternType();
+                
                 int DesignTypeOption = 0;
                 int Auto = 0;
 
