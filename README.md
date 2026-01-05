@@ -1,5 +1,9 @@
 # SectionCutter
 
+PROJECT HAS BEEN MOVED TO https://github.com/retug/SectionCutter2/.
+
+This project is no longer supported.
+
 Section Cut Tool to assit engineers in slicing planar diaphragms. Working to actively support, let me know of bugs/program features you want added.
 
 ![sectioncutimage](https://github.com/retug/SectionCutter/assets/45467091/39d90bce-b521-4fea-ab5d-caf4dc07f3f3)
